@@ -80,43 +80,10 @@ const HomePage = () => {
       </Paper>
 
       {/* Features Section */}
-      <Container maxWidth="lg" sx={{ mb: 6 }}>
-        <Typography variant="h4" component="h2" gutterBottom align="center" sx={{ mb: 4 }}>
-          Caratteristiche principali
-        </Typography>
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, height: '100%', borderRadius: 2 }}>
-              <Typography variant="h5" component="h3" gutterBottom color="primary">
-                Autenticazione sicura
-              </Typography>
-              <Typography variant="body1">
-                Sistema di autenticazione basato su JWT con gestione sicura delle password e protezione delle rotte.
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, height: '100%', borderRadius: 2 }}>
-              <Typography variant="h5" component="h3" gutterBottom color="primary">
-                Gestione ruoli
-              </Typography>
-              <Typography variant="body1">
-                Sistema di controllo degli accessi basato su ruoli (RBAC) con utenti normali e amministratori.
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, height: '100%', borderRadius: 2 }}>
-              <Typography variant="h5" component="h3" gutterBottom color="primary">
-                API RESTful
-              </Typography>
-              <Typography variant="body1">
-                Backend Express.js con API RESTful per la gestione degli utenti e dell'autenticazione.
-              </Typography>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
+      
+          
+        
+    
     </Box>
   );
 };
