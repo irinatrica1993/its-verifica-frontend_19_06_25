@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// URL del backend deployato
+const API_URL = 'https://its-verifica-auth-system-api.windsurf.build/api';
 
 // Crea un'istanza di axios con la configurazione di base
 const api = axios.create({
