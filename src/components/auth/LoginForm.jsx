@@ -80,20 +80,36 @@ const LoginForm = () => {
       }}
     >
       <Paper
-        elevation={3}
+        elevation={8}
         sx={{
-          p: 4,
+          p: 5,
           width: '100%',
-          maxWidth: 450,
-          borderRadius: 2
+          maxWidth: 480,
+          borderRadius: 4,
+          background: 'linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)',
+          border: '1px solid rgba(0,0,0,0.05)'
         }}
       >
-        <Typography variant="h4" component="h1" align="center" gutterBottom>
-          Accedi
-        </Typography>
-        <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 3 }}>
-          Inserisci le tue credenziali per accedere
-        </Typography>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Box
+            sx={{
+              display: 'inline-flex',
+              p: 2,
+              borderRadius: '50%',
+              bgcolor: 'primary.light',
+              color: 'primary.main',
+              mb: 2
+            }}
+          >
+            <Visibility sx={{ fontSize: 40 }} />
+          </Box>
+          <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ fontWeight: 700 }}>
+            Bentornato!
+          </Typography>
+          <Typography variant="body1" color="text.secondary" align="center">
+            Accedi al tuo account per continuare
+          </Typography>
+        </Box>
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -151,7 +167,20 @@ const LoginForm = () => {
             color="primary"
             size="large"
             disabled={loading}
-            sx={{ mt: 3, mb: 2, py: 1.5 }}
+            sx={{ 
+              mt: 3, 
+              mb: 2, 
+              py: 1.8,
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              borderRadius: 2,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              '&:hover': {
+                boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                transform: 'translateY(-1px)'
+              },
+              transition: 'all 0.3s ease'
+            }}
           >
             {loading ? <CircularProgress size={24} /> : 'Accedi'}
           </Button>

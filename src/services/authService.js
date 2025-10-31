@@ -49,22 +49,68 @@ const authService = {
           mappedData.nome = userData.name;
           mappedData.cognome = 'N/A';
         }
+      } else {
+        console.error('ERRORE: Campo name mancante nei dati di registrazione');
+        throw new Error('Nome completo obbligatorio');
       }
       
       // Aggiungi gli altri campi
       mappedData.email = userData.email;
       mappedData.password = userData.password;
       
-      console.log('Dati mappati per il backend:', { ...mappedData, password: '***' });
+      // Assicuriamoci che l'email sia in formato stringa
+      if (typeof mappedData.email !== 'string') {
+        console.error('ERRORE: Email non è una stringa', typeof mappedData.email);
+        mappedData.email = String(mappedData.email || '');
+      }
+      
+      // Verifica che tutti i campi obbligatori siano presenti e non vuoti
+      if (!mappedData.nome || !mappedData.cognome || !mappedData.email || !mappedData.password) {
+        console.error('ERRORE: Campi obbligatori mancanti', { 
+          nome: !!mappedData.nome, 
+          cognome: !!mappedData.cognome, 
+          email: !!mappedData.email, 
+          password: !!mappedData.password 
+        });
+        throw new Error('Tutti i campi sono obbligatori');
+      }
+      
+      // Aggiungiamo un ruolo di default se non specificato
+      if (!mappedData.role) {
+        mappedData.role = 'user';
+      }
+      
+      console.log('Dati mappati per il backend:', { 
+        nome: mappedData.nome,
+        cognome: mappedData.cognome,
+        email: mappedData.email,
+        password: '***'
+      });
       
       const response = await api.post('/auth/register', mappedData);
+      console.log('Risposta dal server:', response.status, response.statusText);
+      
       if (response.data.token) {
+        // Mappa nome e cognome in name per il frontend
+        const nome = response.data.user.nome || 'Utente';
+        const cognome = response.data.user.cognome || '';
+        const user = {
+          ...response.data.user,
+          name: `${nome} ${cognome}`.trim()
+        };
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('user', JSON.stringify(user));
+        return { ...response.data, user };
       }
       return response.data;
     } catch (error) {
-      console.error('Errore durante la registrazione:', error.response?.data || error.message);
+      console.error('Errore durante la registrazione:', error);
+      console.error('Dettagli errore:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        headers: error.response?.headers
+      });
       throw error;
     }
   },
@@ -73,8 +119,16 @@ const authService = {
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
     if (response.data.token) {
+      // Mappa nome e cognome in name per il frontend
+      const nome = response.data.user.nome || 'Utente';
+      const cognome = response.data.user.cognome || '';
+      const user = {
+        ...response.data.user,
+        name: `${nome} ${cognome}`.trim()
+      };
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('user', JSON.stringify(user));
+      return { ...response.data, user };
     }
     return response.data;
   },

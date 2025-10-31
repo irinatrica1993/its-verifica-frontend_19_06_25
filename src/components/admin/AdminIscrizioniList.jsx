@@ -257,18 +257,35 @@ const AdminIscrizioniList = () => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((iscrizione, index) => (
                   <TableRow key={iscrizione.id || index}>
-                    <TableCell>{iscrizione.id || 'N/D'}</TableCell>
+                    <TableCell>{iscrizione.id?.substring(0, 8) || 'N/D'}</TableCell>
                     <TableCell>
-                      {/* Gestisci in modo sicuro l'accesso ai dati dell'utente */}
-                      {(iscrizione.user || iscrizione.utente || {}).nome || 'N/D'} {(iscrizione.user || iscrizione.utente || {}).cognome || ''}
+                      {(() => {
+                        const user = iscrizione.user || iscrizione.utente || {};
+                        const nome = user.nome || '';
+                        const cognome = user.cognome || '';
+                        const fullName = `${nome} ${cognome}`.trim();
+                        return fullName || 'Utente sconosciuto';
+                      })()}
                     </TableCell>
                     <TableCell>{(iscrizione.user || iscrizione.utente || {}).email || 'N/D'}</TableCell>
-                    <TableCell>{(iscrizione.evento || {}).titolo || 'N/D'}</TableCell>
                     <TableCell>
-                      {iscrizione.createdAt ? new Date(iscrizione.createdAt).toLocaleString() : 'N/D'}
+                      {(() => {
+                        const evento = iscrizione.evento || {};
+                        return evento.titolo || 'Evento non disponibile';
+                      })()}
                     </TableCell>
                     <TableCell>
-                      {/* Usa checkinEffettuato invece di checkIn */}
+                      {iscrizione.createdAt 
+                        ? new Date(iscrizione.createdAt).toLocaleString('it-IT', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                        : 'N/D'}
+                    </TableCell>
+                    <TableCell>
                       {iscrizione.checkinEffettuato ? (
                         <Chip 
                           label="Effettuato" 
@@ -286,14 +303,24 @@ const AdminIscrizioniList = () => {
                       )}
                     </TableCell>
                     <TableCell align="right">
-                      <Button
-                        variant="outlined"
-                        color={iscrizione.checkinEffettuato ? "error" : "success"}
-                        size="small"
-                        onClick={() => handleToggleCheckin(iscrizione.id, iscrizione.checkinEffettuato)}
-                      >
-                        {iscrizione.checkinEffettuato ? "Annulla check-in" : "Effettua check-in"}
-                      </Button>
+                      {(() => {
+                        const evento = iscrizione.evento || {};
+                        const eventoData = evento.data ? new Date(evento.data) : null;
+                        const isEventoScaduto = eventoData && eventoData < new Date();
+                        
+                        return (
+                          <Button
+                            variant="outlined"
+                            color={iscrizione.checkinEffettuato ? "error" : "success"}
+                            size="small"
+                            onClick={() => handleToggleCheckin(iscrizione.id, iscrizione.checkinEffettuato)}
+                            disabled={isEventoScaduto}
+                            title={isEventoScaduto ? 'Evento scaduto' : ''}
+                          >
+                            {iscrizione.checkinEffettuato ? "Annulla check-in" : "Effettua check-in"}
+                          </Button>
+                        );
+                      })()}
                     </TableCell>
                   </TableRow>
                 ))

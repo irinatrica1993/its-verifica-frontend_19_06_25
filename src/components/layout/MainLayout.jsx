@@ -92,8 +92,15 @@ const MainLayout = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" elevation={0}>
-        <Toolbar>
+      <AppBar 
+        position="static" 
+        elevation={0}
+        sx={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        }}
+      >
+        <Toolbar sx={{ py: 1 }}>
           {isMobile && (
             <IconButton
               color="inherit"
@@ -114,14 +121,33 @@ const MainLayout = () => {
               flexGrow: 1, 
               textDecoration: 'none', 
               color: 'inherit',
-              fontWeight: 'bold'
+              fontWeight: 800,
+              fontSize: '1.3rem',
+              letterSpacing: '0.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
             }}
           >
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                bgcolor: 'rgba(255,255,255,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              🔐
+            </Box>
             ITS Verifica
           </Typography>
           
           {!isMobile && (
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               {menuItems.map((item) => (
                 <Button
                   key={item.text}
@@ -129,7 +155,17 @@ const MainLayout = () => {
                   to={item.path}
                   color="inherit"
                   startIcon={item.icon}
-                  sx={{ ml: 1 }}
+                  sx={{ 
+                    px: 2,
+                    py: 1,
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,0.15)',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
                 >
                   {item.text}
                 </Button>

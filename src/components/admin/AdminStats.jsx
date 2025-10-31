@@ -76,11 +76,17 @@ const AdminStats = () => {
         iscrizioniResponse = results.flat(); // Appiattisce l'array di array in un unico array
       }
       
-      // Calcola le statistiche
+      // Calcola le statistiche (usa 'data' invece di 'dataInizio'/'dataFine')
       const now = new Date();
-      const upcomingEvents = eventiResponse.filter(e => new Date(e.dataInizio) > now).length;
-      const activeEvents = eventiResponse.filter(e => new Date(e.dataInizio) <= now && new Date(e.dataFine) >= now).length;
-      const pastEvents = eventiResponse.filter(e => new Date(e.dataFine) < now).length;
+      const upcomingEvents = eventiResponse.filter(e => {
+        const dataEvento = new Date(e.data || e.dataInizio);
+        return !isNaN(dataEvento.getTime()) && dataEvento > now;
+      }).length;
+      const activeEvents = 0; // Non possiamo determinare eventi in corso con solo una data
+      const pastEvents = eventiResponse.filter(e => {
+        const dataEvento = new Date(e.data || e.dataInizio);
+        return !isNaN(dataEvento.getTime()) && dataEvento < now;
+      }).length;
       
       // Calcola il tasso di check-in (usando checkinEffettuato invece di checkIn)
       const totalCheckIns = iscrizioniResponse.filter(i => i && i.checkinEffettuato).length;
@@ -272,10 +278,16 @@ const AdminStats = () => {
                   {stats.mostPopularEvent.descrizione?.length > 100 ? '...' : ''}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Luogo: {stats.mostPopularEvent.luogo}
+                  Luogo: {stats.mostPopularEvent.luogo || 'Non specificato'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Data: {new Date(stats.mostPopularEvent.dataInizio).toLocaleDateString()}
+                  Data: {(() => {
+                    const dataEvento = stats.mostPopularEvent.data || stats.mostPopularEvent.dataInizio;
+                    if (!dataEvento) return 'Non disponibile';
+                    const date = new Date(dataEvento);
+                    if (isNaN(date.getTime())) return 'Non valida';
+                    return date.toLocaleDateString('it-IT');
+                  })()}
                 </Typography>
               </Box>
             ) : (
@@ -298,19 +310,27 @@ const AdminStats = () => {
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs={12} sm={3}>
                         <Typography variant="subtitle1">
-                          {/* Gestisci in modo sicuro l'accesso ai dati dell'utente */}
-                          {(iscrizione.user || iscrizione.utente || {}).nome || 'N/D'} {(iscrizione.user || iscrizione.utente || {}).cognome || ''}
+                          {(() => {
+                            const user = iscrizione.user || iscrizione.utente || {};
+                            const nome = user.nome || '';
+                            const cognome = user.cognome || '';
+                            const fullName = `${nome} ${cognome}`.trim();
+                            return fullName || 'Utente sconosciuto';
+                          })()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {(iscrizione.user || iscrizione.utente || {}).email || 'N/D'}
+                          {(iscrizione.user || iscrizione.utente || {}).email || 'Email non disponibile'}
                         </Typography>
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         <Typography variant="subtitle1">
-                          {(iscrizione.evento || {}).titolo || 'N/D'}
+                          {(() => {
+                            const evento = iscrizione.evento || {};
+                            return evento.titolo || 'Evento non disponibile';
+                          })()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {(iscrizione.evento || {}).luogo || 'N/D'}
+                          {(iscrizione.evento || {}).luogo || 'Luogo non specificato'}
                         </Typography>
                       </Grid>
                       <Grid item xs={12} sm={2}>
@@ -326,7 +346,15 @@ const AdminStats = () => {
                       </Grid>
                       <Grid item xs={12} sm={2}>
                         <Typography variant="body2" color="text.secondary">
-                          {new Date(iscrizione.createdAt).toLocaleString()}
+                          {iscrizione.createdAt 
+                            ? new Date(iscrizione.createdAt).toLocaleString('it-IT', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : 'Data non disponibile'}
                         </Typography>
                       </Grid>
                     </Grid>

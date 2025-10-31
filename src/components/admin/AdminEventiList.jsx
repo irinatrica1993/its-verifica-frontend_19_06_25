@@ -159,13 +159,14 @@ const AdminEventiList = () => {
 
   const getStatusChip = (evento) => {
     const now = new Date();
-    const dataInizio = new Date(evento.dataInizio);
-    const dataFine = new Date(evento.dataFine);
+    const dataEvento = new Date(evento.data || evento.dataInizio);
     
-    if (now < dataInizio) {
+    if (isNaN(dataEvento.getTime())) {
+      return <Chip label="Data non valida" color="error" size="small" />;
+    }
+    
+    if (now < dataEvento) {
       return <Chip label="In programma" color="primary" size="small" />;
-    } else if (now >= dataInizio && now <= dataFine) {
-      return <Chip label="In corso" color="success" size="small" />;
     } else {
       return <Chip label="Terminato" color="default" size="small" />;
     }
@@ -224,16 +225,37 @@ const AdminEventiList = () => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((evento) => (
                   <TableRow key={evento.id}>
-                    <TableCell>{evento.id}</TableCell>
-                    <TableCell>{evento.titolo}</TableCell>
-                    <TableCell>{evento.luogo}</TableCell>
+                    <TableCell>{evento.id?.substring(0, 8) || 'N/D'}</TableCell>
+                    <TableCell>{evento.titolo || 'Senza titolo'}</TableCell>
+                    <TableCell>{evento.luogo || 'Non specificato'}</TableCell>
                     <TableCell>
-                      {new Date(evento.dataInizio).toLocaleString()}
+                      {(() => {
+                        // Usa 'data' invece di 'dataInizio' per compatibilità con lo schema
+                        const dataEvento = evento.data || evento.dataInizio;
+                        if (!dataEvento) return 'Data non disponibile';
+                        const date = new Date(dataEvento);
+                        if (isNaN(date.getTime())) return 'Data non valida';
+                        return date.toLocaleString('it-IT', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      })()}
                     </TableCell>
                     <TableCell>
-                      {new Date(evento.dataFine).toLocaleString()}
+                      {(() => {
+                        // Usa 'data' invece di 'dataFine' per compatibilità con lo schema
+                        const dataEvento = evento.data || evento.dataFine;
+                        if (!dataEvento) return '-';
+                        const date = new Date(dataEvento);
+                        if (isNaN(date.getTime())) return '-';
+                        // Per ora mostriamo la stessa data, in futuro si può aggiungere dataFine allo schema
+                        return '-';
+                      })()}
                     </TableCell>
-                    <TableCell>{evento.postiDisponibili}</TableCell>
+                    <TableCell>{evento.postiDisponibili || 0}</TableCell>
                     <TableCell>
                       {getStatusChip(evento)}
                     </TableCell>
